@@ -19,7 +19,7 @@
 #
 
 include_recipe %w{apache2 apache2::mod_php5 apache2::mod_rewrite apache2::mod_expires}
-include_recipe %w{php php::module_mysql php::module_gd}
+include_recipe %w{php php::module_gd}
 include_recipe "drupal::drush"
 
 # Centos does not include the php-dom extension in it's minimal php install.
@@ -30,35 +30,51 @@ when 'rhel', 'fedora'
   end
 end
 
-if node['drupal']['site']['host'] == "localhost"
-  include_recipe "mysql::server"
+# Setting up a database engine
+if node['drupal']['db']['driver'] == 'mysql'
+  include_recipe %w{php::module_mysql database::mysql}
+  
+  if node['drupal']['site']['host'] == "localhost"
+    include_recipe "mysql::server"
+  else
+    include_recipe "mysql::client"
+  end
 else
-  include_recipe "mysql::client"
+  log("Only databases currently supported: mysql. You have: #{node['drupal']['db']['driver']}") {level :warn}
 end
 
-execute "mysql-install-drupal-privileges" do
-  command "/usr/bin/mysql -h #{node['drupal']['db']['host']} -u root -p#{node['mysql']['server_root_password']} < /etc/mysql/drupal-grants.sql"
-  action :nothing
+# Create database
+connection_info = {:host => node['drupal']['db']['host'], :username => 'root', :password => node['mysql']['server_root_password']}
+
+mysql_database node['drupal']['db']['database'] do
+  connection connection_info
+  action :create
+  not_if "mysql -h #{node['drupal']['db']['host']} -u root -p#{node['mysql']['server_root_password']} --silent --skip-column-names --execute=\"SHOW DATABASES LIKE '#{node['drupal']['db']['database']}';\""
 end
 
-template "/etc/mysql/drupal-grants.sql" do
-  path "/etc/mysql/drupal-grants.sql"
-  source "grants.sql.erb"
-  owner "root"
-  group "root"
-  mode "0600"
-  variables(
-    :user     => node['drupal']['db']['user'],
-    :password => node['drupal']['db']['password'],
-    :database => node['drupal']['db']['database'],
-    :host => node['drupal']['site']['host']
-  )
-  notifies :run, "execute[mysql-install-drupal-privileges]", :immediately
+# Create user and grant all rights
+mysql_database_user node['drupal']['db']['user'] do
+  connection connection_info
+  password node['drupal']['db']['password']
+  database_name node['drupal']['db']['database']
+  host node['drupal']['db']['host']
+  privileges [:all]
+  action :grant
 end
 
-execute "create #{node['drupal']['db']['database']} database" do
-  command "/usr/bin/mysqladmin -h #{node['drupal']['db']['host']} -u root -p#{node['mysql']['server_root_password']} create #{node['drupal']['db']['database']}"
-  not_if "mysql -h #{node['drupal']['db']['host']} -u root -p#{node['mysql']['server_root_password']} --silent --skip-column-names --execute=\"show databases like '#{node['drupal']['db']['database']}'\" | grep #{node['drupal']['db']['database']}"
+mysql_database_user node['drupal']['db']['user'] do
+  connection connection_info
+  password node['drupal']['db']['password']
+  database_name node['drupal']['db']['database']
+  host '%'
+  privileges [:all]
+  action :grant
+end
+
+mysql_database node['drupal']['db']['database'] do
+  connection connection_info
+  sql "flush privileges"
+  action :query
 end
 
 execute "download-and-install-drupal" do

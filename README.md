@@ -22,12 +22,14 @@ Opscode cookbooks (http://github.com/opscode/cookbooks/tree/master)
 * php
 * apache2
 * openssl (used to generate the secure random drupal db password)
+* database
 
 # ATTRIBUTES:
 
 * drupal[:version] - version of drupal to download and install (default: 6.19)
 * drupal[:checksum] - sha256sum of the source tarball
 * drupal[:dir] - location to copy the drupal files. (default: /var/www/drupal)
+* drupal[:db][:driver] - select the database driver. Only "mysql" is currently available.
 * drupal[:db][:database] - drupal database (default: drupal)
 * drupal[:db][:user] - drupal db user (default: drupal)
 * drupal[:db][:host] - durpal db host (default: localhost)

@@ -20,6 +20,7 @@
 
 default['drupal']['version'] = "7.21"
 default['drupal']['dir'] = "/var/www/drupal"
+default['drupal']['db']['driver'] = "mysql"
 default['drupal']['db']['database'] = "drupal"
 default['drupal']['db']['user'] = "drupal"
 default['drupal']['db']['host'] = "localhost"
