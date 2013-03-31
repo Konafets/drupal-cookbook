@@ -6,3 +6,5 @@ tmp/
 *.swp
 .rvmrc
 
+
+/templates/.DS_Store

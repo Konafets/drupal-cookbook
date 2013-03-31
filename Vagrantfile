@@ -31,7 +31,6 @@ Vagrant.configure("2") do |config|
         :db => {
           :password => "drupalpass"
         },
-        :dir => "/vagrant/mysite"
       },
       :hosts => {
         :localhost_aliases => ["drupal.vbox.local", "dev-site.vbox.local"]
