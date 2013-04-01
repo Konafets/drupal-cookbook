@@ -18,9 +18,26 @@
 # limitations under the License.
 #
 
-include_recipe %w{apache2 apache2::mod_php5 apache2::mod_rewrite apache2::mod_expires}
-include_recipe %w{php php::module_gd}
+# Set up common php 
+include_recipe %w{php php::module_gd php::module_curl php::module_apc}
 include_recipe "drupal::drush"
+
+# Setting up a webserver
+if node['drupal']['webserver'] == "apache2"
+  include_recipe %w{apache2 apache2::mod_php5 apache2::mod_rewrite apache2::mod_expires}
+elsif node['drupal']['webserver'] == "nginx"
+  include_recipe %w{nginx php-fpm}
+    
+  directory '/var/www' do
+    owner 'root'
+    group 'root'
+    mode 0775
+    action :create
+  end
+else
+  log("Only webservers currently supported: apache2 and nginx. You have: #{node[:drupal][:webserver]}") { level :warn }
+end
+
 
 # Centos does not include the php-dom extension in it's minimal php install.
 case node['platform_family']
@@ -122,17 +139,43 @@ if node['drupal']['modules']
   end
 end
 
-web_app "drupal" do
-  template "drupal.conf.erb"
-  docroot node['drupal']['dir']
-  server_name server_fqdn
-  server_aliases node['fqdn']
+if node['drupal']['webserver'] == "apache2"
+  web_app "drupal" do
+    template "drupal.conf.erb"
+    docroot node['drupal']['dir']
+    server_name server_fqdn
+    server_aliases node['fqdn']
+  end
+
+  execute "disable-default-site" do
+    command "sudo a2dissite default"
+    notifies :reload, "service[apache2]", :delayed
+    only_if do File.exists? "#{node['apache']['dir']}/sites-enabled/default" end
+  end
+elsif node['drupal']['webserver'] == "nginx"
+  template "#{node['nginx']['dir']}/sites-available/drupal" do
+    source "sites.conf.erb"
+    owner "root"
+    group "root"
+    mode "0600"
+    variables(
+      :docroot => "#{node['drupal']['dir']}",
+      :server_name => server_fqdn
+    )
+  end
+
+  nginx_site "drupal" do
+    enable :true
+  end
+
+  execute "disable-default-site" do
+    command "sudo nxdissite default"
+    notifies :reload, "service[nginx]", :delayed
+    only_if do
+      ::File.symlink?("#{node['nginx']['dir']}/sites-enabled/default") ||
+        ::File.symlink?("#{node['nginx']['dir']}/sites-enabled/000-default")
+    end
+  end
 end
 
 include_recipe "drupal::cron"
-
-execute "disable-default-site" do
-   command "sudo a2dissite default"
-   notifies :reload, "service[apache2]", :delayed
-   only_if do File.exists? "#{node['apache']['dir']}/sites-enabled/default" end
-end

@@ -34,7 +34,10 @@ Vagrant.configure("2") do |config|
       },
       :hosts => {
         :localhost_aliases => ["drupal.vbox.local", "dev-site.vbox.local"]
-      }  
+      },
+      :nginx => {
+        :default_site_enabled => false
+      }
     }
     
     chef.run_list = [

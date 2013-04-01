@@ -9,7 +9,7 @@ recipe           "drupal", "Installs and configures Drupal"
 recipe           "drupal::cron", "Sets up the default drupal cron"
 recipe           "drupal::drush", "Installs drush - a command line shell and scripting interface for Drupal"
 
-%w{ php apache2 mysql openssl firewall cron database }.each do |cb|
+%w{ php php-fpm apache2 nginx mysql openssl firewall cron database }.each do |cb|
   depends cb
 end
 

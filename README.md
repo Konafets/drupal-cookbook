@@ -16,13 +16,17 @@ should work just fine on any other distributions.
 
 ## Cookbooks:
 
-Opscode cookbooks (http://github.com/opscode/cookbooks/tree/master)
+Opscode cookbooks (https://github.com/opscode-cookbooks)
 
 * mysql
 * php
+* php-fpm
 * apache2
+* nginx
 * openssl (used to generate the secure random drupal db password)
 * database
+* cron
+* firewall
 
 # ATTRIBUTES:
 
@@ -35,6 +39,7 @@ Opscode cookbooks (http://github.com/opscode/cookbooks/tree/master)
 * drupal[:db][:host] - durpal db host (default: localhost)
 * drupal[:db][:password] - drupal db password (randomly generated if not defined)
 * drupal[:src] - where to place the drupal source tarball (default: Chef::Config[:file_cache_path])
+* drupal['webserver'] - set the webserver. Valid options are 'apache2' or 'nginx' (default: apache2)
 
 * drupal[:drush][:version] - version of drush to download (default: 3.3)
 * drupal[:drush][:checksum] - sha256sum of the drush tarball
