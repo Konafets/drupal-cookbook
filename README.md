@@ -39,7 +39,9 @@ Opscode cookbooks (https://github.com/opscode-cookbooks)
 * drupal[:db][:host] - durpal db host (default: localhost)
 * drupal[:db][:password] - drupal db password (randomly generated if not defined)
 * drupal[:src] - where to place the drupal source tarball (default: Chef::Config[:file_cache_path])
-* drupal['webserver'] - set the webserver. Valid options are 'apache2' or 'nginx' (default: apache2)
+* drupal[:webserver] - set the webserver. Valid options are 'apache2' or 'nginx' (default: apache2)
+* drupal[:modules][:enable] - installs and enable modules. You can pass a single value or an array (default: view and webforms)
+* drupal[:modules][:disable] - disable modules. You can pass a single value or an array.
 
 * drupal[:drush][:version] - version of drush to download (default: 3.3)
 * drupal[:drush][:checksum] - sha256sum of the drush tarball

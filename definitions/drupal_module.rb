@@ -1,9 +1,11 @@
 #
 # Author:: Marius Ducea (marius@promethost.com)
+# Author:: Stefano Kowalke <blueduck@gmx.net>
 # Cookbook Name:: drupal
 # Definition:: drupal_module
 #
 # Copyright 2010, Promet Solutions
+# Copyright 2013, Stefano Kowalke
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,15 +30,20 @@ define :drupal_module, :action => :install, :dir => nil, :version => nil do
     execute "drush_dl_module #{params[:name]}" do
       cwd params[:dir]
       command "#{node['drupal']['drush']['dir']}/drush -y dl #{params[:name]}"
-      not_if "#{node['drupal']['drush']['dir']}/drush -r #{params[:dir]} pm-list |grep '(#{params[:name]})' |grep '#{params[:version]}'"
+      not_if "#{node['drupal']['drush']['dir']}/drush -r #{params[:dir]} pm-list | grep '(#{params[:name]})' | grep '#{params[:version]}'"
     end
     execute "drush_en_module #{params[:name]}" do
       cwd params[:dir]
       command "#{node['drupal']['drush']['dir']}/drush -y en #{params[:name]}"
-      not_if "#{node['drupal']['drush']['dir']}/drush -r #{params[:dir]} pm-list |grep '(#{params[:name]})' |grep -i 'enabled'"
+      not_if "#{node['drupal']['drush']['dir']}/drush -r #{params[:dir]} pm-list | grep '(#{params[:name]})' | grep -i 'enabled'"
+    end
+  when :disable
+    execute "drush_dis_module #{params[:name]}" do
+      cwd params[:dir]
+      command "#{node['drupal']['drush']['dir']}/drush -y dis #{params[:name]}"
+      not_if "#{node['drupal']['drush']['dir']}/drush -r #{params[:dir]} pm-list | grep '(#{params[:name]})' | grep -i 'disabled'"
     end
   else
     log "drupal_source action #{params[:name]} is unrecognized."
   end
 end
-

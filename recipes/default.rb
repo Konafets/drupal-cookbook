@@ -124,21 +124,6 @@ template "#{node['drupal']['dir']}/sites/default/settings.php" do
   )
 end
 
-if node['drupal']['modules']
-  node['drupal']['modules'].each do |m|
-    if m.is_a?Array
-      drupal_module m.first do
-        version m.last
-        dir node['drupal']['dir']
-      end
-    else
-      drupal_module m do
-        dir node['drupal']['dir']
-      end
-    end
-  end
-end
-
 if node['drupal']['webserver'] == "apache2"
   web_app "drupal" do
     template "drupal.conf.erb"
@@ -179,3 +164,36 @@ elsif node['drupal']['webserver'] == "nginx"
 end
 
 include_recipe "drupal::cron"
+
+if node['drupal']['modules']['enable']
+  node['drupal']['modules']['enable'].each do |m|
+    if m.is_a?Array
+      drupal_module m.first do
+        version m.last
+        dir node['drupal']['dir']
+        action :install
+      end
+    else
+      drupal_module m do
+        dir node['drupal']['dir']
+        action :install
+      end
+    end
+  end
+end
+
+if node['drupal']['modules']['disable']
+  node['drupal']['modules']['disable'].each do |m|
+    if m.is_a?Array
+      drupal_module m.first do
+        dir node['drupal']['dir']
+        action :disable
+      end
+    else
+      drupal_module m do
+        dir node['drupal']['dir']
+        action :disable
+      end
+    end
+  end
+end
