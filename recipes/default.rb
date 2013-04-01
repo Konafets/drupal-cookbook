@@ -197,3 +197,67 @@ if node['drupal']['modules']['disable']
     end
   end
 end
+
+if node['drupal']['language']['add']
+  node['drupal']['language']['add'].each do |m|
+    if m.is_a?Array
+      drupal_language m.first do
+        dir node['drupal']['dir']
+        action :add
+      end
+    else
+      drupal_language m do
+        dir node['drupal']['dir']
+        action :add
+      end
+    end
+  end
+end
+
+if node['drupal']['language']['enable']
+  node['drupal']['language']['enable'].each do |m|
+    if m.is_a?Array
+      drupal_language m.first do
+        dir node['drupal']['dir']
+        action :enable
+      end
+    else
+      drupal_language m do
+        dir node['drupal']['dir']
+        action :enable
+      end
+    end
+  end
+end
+
+if node['drupal']['language']['disable']
+  node['drupal']['language']['disable'].each do |m|
+    if m.is_a?Array
+      drupal_language m.first do
+        dir node['drupal']['dir']
+        action :disable
+      end
+    else
+      drupal_language m do
+        dir node['drupal']['dir']
+        action :disable
+      end
+    end
+  end
+end
+
+if node['drupal']['language']['default']
+  node['drupal']['language']['default'].each do |m|
+    if m.is_a?Array
+      drupal_language m.first do
+        dir node['drupal']['dir']
+        action :setdefault
+      end
+    else
+      drupal_language m do
+        dir node['drupal']['dir']
+        action :setdefault
+      end
+    end
+  end
+end

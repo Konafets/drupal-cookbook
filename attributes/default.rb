@@ -43,3 +43,7 @@ default['drupal']['drush']['dir'] = "/usr/local/drush"
 default['drupal']['modules']['enable'] = ["views", "webform"]
 default['drupal']['modules']['disable'] = []
 
+default['drupal']['language']['add'] = ["de"]
+default['drupal']['language']['default'] = ["de"]
+default['drupal']['language']['enable'] = []
+default['drupal']['language']['disable'] = ["en"]

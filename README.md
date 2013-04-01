@@ -43,6 +43,11 @@ Opscode cookbooks (https://github.com/opscode-cookbooks)
 * drupal[:modules][:enable] - installs and enable modules. You can pass a single value or an array (default: view and webforms)
 * drupal[:modules][:disable] - disable modules. You can pass a single value or an array.
 
+* drupal[:language][:add] - use the langcode (e.g. "de" for german) to add a language.
+* drupal[:language][:default] - use the langcode to set the language as default language.
+* drupal[:language][:enable] - use the langcode to enable the language.
+* drupal[:language][:disable] - use the langcode to disable the language. (default: en)
+
 * drupal[:drush][:version] - version of drush to download (default: 3.3)
 * drupal[:drush][:checksum] - sha256sum of the drush tarball
 * drupal[:drush][:dir] - where to install the drush file. (default: /usr/local/drush)
